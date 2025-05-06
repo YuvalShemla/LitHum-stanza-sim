@@ -19,16 +19,23 @@ def load_model():
 @st.cache_resource(show_spinner="Loading data…")
 def load_data():
     poems_path      = BASE_DIR / "Ibn_Arabi_poems.json"
-    lookup_path     = BASE_DIR / "stanza_lookup.pkl"
-    embeddings_path = BASE_DIR / "embeddings.npy"
+    embeddings_path = BASE_DIR / "Ibn_Arabi_poems_embeddings.npz"
 
-    with open(poems_path, encoding="utf-8") as f:
-        poems = json.load(f)
+    # ---- poems dict ------------------------------------------------
+    with poems_path.open(encoding="utf-8") as f:
+        poems = json.load(f)   # {title: [stanza1, stanza2, …]}
 
-    with open(lookup_path, "rb") as f:
-        stanza_lookup = pickle.load(f)
+    # ---- stanza lookup table --------------------------------------
+    stanza_lookup = []         # [(title, stanza_idx, stanza_txt), …]
+    for title, stanzas in poems.items():
+        stanza_lookup.extend(
+            (title, i, s) for i, s in enumerate(stanzas)
+        )
 
-    embeddings = np.load(embeddings_path)
+    # ---- embeddings ----------------------------------------------
+    # npz assumes the array is stored under arr_0
+    embeddings = np.load(embeddings_path, allow_pickle=True)["embeddings"]
+    # If your .npz has a named array, use np.load(...)[<key>]
 
     return poems, stanza_lookup, embeddings
 
