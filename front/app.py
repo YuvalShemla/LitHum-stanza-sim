@@ -5,27 +5,31 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 import time
 from pathlib import Path
+import pickle
 
-# ---- Paths ----
-NPZ_PATH   = "Ibn_Arabi_poems_embeddings.npz"
-POEMS_JSON = "Ibn_Arabi_poems.json"
 
-# ---- Load Data ----
+BASE_DIR = Path(__file__).parent           # == front/
+
+# ---------- helpers ------------------------------------------------
 @st.cache_resource(show_spinner="Loading embedding model…")
 def load_model():
-    local_dir = Path(__file__).parent / "models" / "all-mpnet-base-v2"
-    return SentenceTransformer(str(local_dir))        #  ← cast to str
+    model_path = BASE_DIR / "models" / "all-mpnet-base-v2"
+    return SentenceTransformer(str(model_path))
 
-
-@st.cache_data(show_spinner="Loading embeddings…")
+@st.cache_resource(show_spinner="Loading data…")
 def load_data():
-    poems = json.loads(open(POEMS_JSON, encoding="utf-8").read())
-    stanza_lookup = []
-    for title, stanzas in poems.items():
-        for i, s in enumerate(stanzas):
-            stanza_lookup.append((title, i, s))
-    data = np.load(NPZ_PATH, allow_pickle=True)
-    embeddings = data["embeddings"]
+    poems_path      = BASE_DIR / "Ibn_Arabi_poems.json"
+    lookup_path     = BASE_DIR / "stanza_lookup.pkl"
+    embeddings_path = BASE_DIR / "embeddings.npy"
+
+    with open(poems_path, encoding="utf-8") as f:
+        poems = json.load(f)
+
+    with open(lookup_path, "rb") as f:
+        stanza_lookup = pickle.load(f)
+
+    embeddings = np.load(embeddings_path)
+
     return poems, stanza_lookup, embeddings
 
 model = load_model()
