@@ -1,6 +1,6 @@
 # ----- core deps ----- #
-torch==2.2.1+cpu                 # first wheel with Python 3.12 support
 --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.2.1+cpu                 # first wheel with Python 3.12 support
 
 sentence-transformers==2.6.1
 transformers==4.39.3
@@ -9,5 +9,4 @@ huggingface-hub==0.23.2
 # ----- other packages ----- #
 pandas
 streamlit
-numpy
-# …
+numpy<2
