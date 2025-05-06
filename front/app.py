@@ -13,9 +13,8 @@ POEMS_JSON = "Ibn_Arabi_poems.json"
 # ---- Load Data ----
 @st.cache_resource(show_spinner="Loading embedding model…")
 def load_model():
-    # /mount/src/lithum-stanza-sim/front/models/all-mpnet-base-v2
     local_dir = Path(__file__).parent / "models" / "all-mpnet-base-v2"
-    return SentenceTransformer(str(local_dir), cache_folder=str(local_dir))  # no network call
+    return SentenceTransformer(str(local_dir))        #  ← cast to str
 
 
 @st.cache_data(show_spinner="Loading embeddings…")
