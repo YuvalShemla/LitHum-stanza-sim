@@ -1,0 +1,2 @@
+models/all-mpnet-base-v2/** filter=lfs diff=lfs merge=lfs -text
+front/models/all-mpnet-base-v2/** filter=lfs diff=lfs merge=lfs -text

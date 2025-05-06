@@ -12,7 +12,7 @@ POEMS_JSON = "Ibn_Arabi_poems.json"
 # ---- Load Data ----
 @st.cache_resource(show_spinner="Loading transformer model…")
 def load_model():
-    return SentenceTransformer("all-mpnet-base-v2")
+    return SentenceTransformer("models/all-mpnet-base-v2")
 
 @st.cache_data(show_spinner="Loading embeddings…")
 def load_data():
