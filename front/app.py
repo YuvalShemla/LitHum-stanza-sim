@@ -44,58 +44,38 @@ poems, stanza_lookup, embeddings = load_data()
 
 # ---- Similarity Search ----
 def top_k_stanzas(query: str, k: int = 5, show_poem: bool = False):
-    """
-    Return the top‑k most similar stanzas (cosine‑sim) to `query`.
-
-    Parameters
-    ----------
-    query : str
-        Free‑text query.
-    k : int, default 5
-        Number of matches to return.
-    show_poem : bool, default False
-        If True, include the full poem text in the results.
-
-    Returns
-    -------
-    pandas.DataFrame
-        Columns: rank · similarity · title · stanza_id · stanza_text
-        (+ full_poem when `show_poem` is True)
-    """
     # -- 1. embed the query --------------------------------------------------
     q_vec = (
         model.encode(query,
-                     convert_to_tensor=True,     # keep as torch.Tensor
-                     normalize_embeddings=True)  # unit‑length
-             .cpu()                            # ensure on CPU
-             .numpy()                          # → ndarray (1, 768)
-             .squeeze()                        # → shape (768,)
+                     convert_to_tensor=True,
+                     normalize_embeddings=True)   # torch.Size([1, 768])
+             .detach()                           # ⬅️ break grad chain
+             .cpu()
+             .numpy()
+             .squeeze()                          # (768,)
     )
 
-    # dtype match (embeddings might be float64)
     if q_vec.dtype != embeddings.dtype:
         q_vec = q_vec.astype(embeddings.dtype, copy=False)
 
     # -- 2. cosine similarities ---------------------------------------------
-    sims  = embeddings @ q_vec                # (N,768) · (768,) → (N,)
-    best  = sims.argsort()[-k:][::-1]         # top‑k indices
+    sims  = embeddings @ q_vec
+    best  = sims.argsort()[-k:][::-1]
 
     # -- 3. build results ----------------------------------------------------
     rows = []
     for rank, idx in enumerate(best, 1):
         score = float(sims[idx])
         title, stanza_idx, stanza_txt = stanza_lookup[idx]
-
-        row = {
-            "rank":        rank,
-            "similarity":  f"{score:.3f}",
-            "title":       title,
-            "stanza_id":   stanza_idx,
-            "stanza_text": stanza_txt,
-        }
+        row = dict(
+            rank        = rank,
+            similarity  = f"{score:.3f}",
+            title       = title,
+            stanza_id   = stanza_idx,
+            stanza_text = stanza_txt,
+        )
         if show_poem:
             row["full_poem"] = "\n".join(poems[title])
-
         rows.append(row)
 
     cols = ["rank", "similarity", "title", "stanza_id", "stanza_text"]
