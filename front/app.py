@@ -13,8 +13,8 @@ BASE_DIR = Path(__file__).parent           # == front/
 # ---------- helpers ------------------------------------------------
 @st.cache_resource(show_spinner="Loading embedding model…")
 def load_model():
-    model_path = BASE_DIR / "models" / "all-mpnet-base-v2"
-    return SentenceTransformer(str(model_path))
+    model_path = Path(__file__).parent / "models" / "all-mpnet-base-v2"
+    return SentenceTransformer(str(model_path.resolve()))
 
 @st.cache_resource(show_spinner="Loading data…")
 def load_data():
