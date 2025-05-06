@@ -1,5 +1,6 @@
 streamlit
-sentence-transformers
-numpy < 2.0.0
+numpy<2
 pandas
+sentence-transformers
+torch
 pdfplumber
