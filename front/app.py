@@ -4,15 +4,19 @@ import pandas as pd
 import streamlit as st
 from sentence_transformers import SentenceTransformer
 import time
+from pathlib import Path
 
 # ---- Paths ----
 NPZ_PATH   = "Ibn_Arabi_poems_embeddings.npz"
 POEMS_JSON = "Ibn_Arabi_poems.json"
 
 # ---- Load Data ----
-@st.cache_resource(show_spinner="Loading transformer model…")
+@st.cache_resource(show_spinner="Loading embedding model…")
 def load_model():
-    return SentenceTransformer("models/all-mpnet-base-v2")
+    # /mount/src/lithum-stanza-sim/front/models/all-mpnet-base-v2
+    local_dir = Path(__file__).parent / "models" / "all-mpnet-base-v2"
+    return SentenceTransformer(str(local_dir), cache_folder=str(local_dir))  # no network call
+
 
 @st.cache_data(show_spinner="Loading embeddings…")
 def load_data():
